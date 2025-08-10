@@ -1,0 +1,129 @@
+/* styles/calendar.css - Styles optimisés pour Tailwind CSS */
+
+/* Configuration de la variable navbar */
+:root {
+  --navbar-total-offset: calc(var(--navbar-height) + 42px);
+}
+
+/* Styles essentiels pour React Calendar (non disponibles dans Tailwind) */
+.react-calendar {
+  width: 100% !important;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  font-family: inherit;
+  line-height: 1.125em;
+}
+
+.react-calendar__navigation {
+  display: flex;
+  height: 44px;
+  margin-bottom: 1em;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.react-calendar__navigation button {
+  min-width: 44px;
+  background: none;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.react-calendar__navigation button:enabled:hover {
+  background-color: #e2e8f0;
+  color: #1e293b;
+}
+
+.react-calendar__navigation button[disabled] {
+  background-color: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: #64748b;
+  background: #f8fafc;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none;
+}
+
+.react-calendar__tile {
+  max-width: 100%;
+  padding: 0.75rem 0.375rem;
+  background: none;
+  text-align: center;
+  line-height: 1rem;
+  font-size: 0.875rem;
+  color: #374151;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.react-calendar__tile:disabled {
+  background-color: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.react-calendar__tile:enabled:hover {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+.react-calendar__tile--now {
+  background: #2563eb !important;
+  color: white !important;
+  font-weight: 600;
+  border-radius: 0.375rem;
+}
+
+.react-calendar__tile--active {
+  background: #1d4ed8 !important;
+  color: white !important;
+  font-weight: 600;
+  border-radius: 0.375rem;
+}
+
+/* Indication des journaux disponibles */
+.react-calendar__tile--hasJournal {
+  background-color: #10b981 !important;
+  color: white !important;
+  font-weight: 600;
+  border-radius: 0.375rem;
+  position: relative;
+}
+
+.react-calendar__tile--hasJournal:enabled:hover {
+  background-color: #059669 !important;
+  color: white !important;
+}
+
+.react-calendar__tile--hasJournal::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 6px;
+  height: 6px;
+  background: #fbbf24;
+  border-radius: 50%;
+  border: 1px solid white;
+}

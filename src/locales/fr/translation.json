@@ -1,0 +1,16 @@
+{
+    "search": "Rechercher",
+    "startDate": "Date début",
+    "endDate": "Date fin",
+    "type": "Type",
+    "all": "Tous",
+    "law": "Loi",
+    "decree": "Décret",
+    "order": "Arrêté",
+    "circular": "Circulaire",
+    "results": "Résultats de la recherche",
+    "noResults": "Aucun résultat trouvé.",
+    "summary": "Résumé",
+    "title": "Titre"
+  }
+  

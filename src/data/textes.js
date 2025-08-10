@@ -1,0 +1,58 @@
+// src/data/textes.js
+
+export const textes = [
+  {
+    id: 1,
+    title: "Loi sur l’éducation",
+    content: "Contenu de la loi sur l’éducation...",
+    date: "2023-01-15",
+    type: "Code",
+    tags: ["éducation", "enseignement"],
+    ministry: "Education",
+  },
+  {
+    id: 2,
+    title: "Décret sanitaire",
+    content: "Ce décret concerne les mesures sanitaires...",
+    date: "2022-12-20",
+    type: "Décret",
+    tags: ["santé", "protection"],
+    ministry: "Santé",
+  },
+  {
+    id: 3,
+    title: "Constitution du Sénégal",
+    content: "Texte intégral de la Constitution du Sénégal...",
+    date: "2001-01-22",
+    type: "Constitutions",
+    tags: ["constitution", "droit"],
+    ministry: "Justice",
+  },
+  {
+    id: 4,
+    title: "Accord collectif sur le travail de nuit",
+    content: "Détails de l'accord collectif sur le travail de nuit...",
+    date: "2021-05-01",
+    type: "Accords collectifs",
+    tags: ["travail", "syndicat"],
+    ministry: "Travail",
+  },
+  {
+    id: 5,
+    title: "Codification des lois commerciales",
+    content: "Processus de codification des lois commerciales...",
+    date: "2024-03-15",
+    type: "Codification",
+    tags: ["commerce", "entreprise"],
+    ministry: "Commerce",
+  },
+  {
+    id: 6,
+    title: "Directive environnementale",
+    content: "Directive concernant la protection de l’environnement...",
+    date: "2023-08-12",
+    type: "Directives",
+    tags: ["environnement", "directive"],
+    ministry: "Environnement",
+  },
+];
