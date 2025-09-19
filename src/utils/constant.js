@@ -1,3 +1,4 @@
+// src/utils/constants.js
 export const APP_CONFIG = {
   name: "JuriSénégal",
   description: "Plateforme officielle d'accès aux textes juridiques du Sénégal",
@@ -7,45 +8,19 @@ export const APP_CONFIG = {
   supportUrl: "https://support.jurisenega.sn"
 };
 
+// Vite: utiliser import.meta.env pour les variables d'environnement
 export const API_ENDPOINTS = {
-  base: process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api',
+  // mettre dans .env (à la racine du projet frontend) : VITE_API_BASE_URL=http://localhost:5000/api
+  base: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
   texts: '/texts',
   search: '/search',
   categories: '/categories',
   auth: '/auth',
   admin: '/admin',
-  stats: '/stats'
-};
-
-export const USER_ROLES = {
-  CITIZEN: 'citizen',
-  PROFESSIONAL: 'professional',
-  STUDENT: 'student',
-  ADMIN: 'administrator',
-  MODERATOR: 'moderator'
-};
-
-export const TEXT_STATUS = {
-  ACTIVE: 'En vigueur',
-  ABROGATED: 'Abrogé',
-  SUSPENDED: 'Suspendu',
-  DRAFT: 'Projet'
-};
-
-export const PAGINATION = {
-  defaultLimit: 12,
   maxLimit: 100
 };
 
 export const VALIDATION_RULES = {
-  search: {
-    minLength: 2,
-    maxLength: 500
-  },
-  password: {
-    minLength: 8,
-    requireUppercase: true,
-    requireLowercase: true,
-    requireNumbers: true
-  }
+  search: { minLength: 2, maxLength: 500 },
+  password: { minLength: 8, requireUppercase: true, requireLowercase: true, requireNumbers: true }
 };
