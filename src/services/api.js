@@ -1,5 +1,4 @@
-/ services/api.js
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 class ApiService {
   constructor() {
@@ -17,8 +16,8 @@ class ApiService {
       ...options,
     };
 
-    // Ajouter le token d'authentification si disponible
-    const token = localStorage.getItem('sunuloi_token');
+    // Token d'authentification
+    const token = localStorage.getItem('sunuloi_token') || sessionStorage.getItem('sunuloi_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -27,24 +26,80 @@ class ApiService {
       const response = await fetch(url, config);
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
       }
       
       return await response.json();
     } catch (error) {
-      console.error('API Request failed:', error);
+      console.error(`API Error ${endpoint}:`, error);
       throw error;
     }
   }
 
-  // Méthodes de recherche
+  // ===== AUTHENTIFICATION =====
+  async login(credentials) {
+    return this.request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials)
+    });
+  }
+
+  async register(userData) {
+    return this.request('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(userData)
+    });
+  }
+
+  async getProfile() {
+    return this.request('/auth/me');
+  }
+
+  async logout() {
+    return this.request('/auth/logout', {
+      method: 'POST'
+    });
+  }
+
+  // ===== DOCUMENTS =====
+  async getDocuments(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return this.request(`/documents${query ? `?${query}` : ''}`);
+  }
+
+  async getDocument(id) {
+    return this.request(`/documents/${id}`);
+  }
+
+  async createDocument(documentData) {
+    return this.request('/documents', {
+      method: 'POST',
+      body: JSON.stringify(documentData)
+    });
+  }
+
+  async updateDocument(id, documentData) {
+    return this.request(`/documents/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(documentData)
+    });
+  }
+
+  async deleteDocument(id) {
+    return this.request(`/documents/${id}`, {
+      method: 'DELETE'
+    });
+  }
+
+  // ===== RECHERCHE =====
   async search(query, options = {}) {
     const params = new URLSearchParams({
-      query,
+      search: query,
       ...options
     }).toString();
     
-    return this.request(`/search?${params}`);
+    return this.request(`/documents?${params}`);
   }
 
   async voiceSearch(audioData, language = 'fr-FR') {
@@ -54,142 +109,24 @@ class ApiService {
     });
   }
 
-  // Méthodes statistiques
-  async getTrends(period = '30d', category) {
-    const params = new URLSearchParams({ period, ...(category && { category }) });
-    return this.request(`/trends?${params}`);
+  // ===== CATÉGORIES =====
+  async getCategories() {
+    return this.request('/categories');
   }
 
-  async getStats() {
-    return this.request('/stats');
+  async getCategory(id) {
+    return this.request(`/categories/${id}`);
   }
 
-  // Méthodes utilisateur
-  async getFavorites() {
-    return this.request('/user/favorites');
-  }
-
-  async addToFavorites(documentId, documentType) {
-    return this.request('/user/favorites', {
-      method: 'POST',
-      body: JSON.stringify({ documentId, documentType })
-    });
-  }
-
-  async getSearchHistory(page = 1, limit = 20) {
-    const params = new URLSearchParams({ page, limit });
-    return this.request(`/user/search-history?${params}`);
-  }
-
-  // Méthodes téléchargement
-  async downloadDocument(documentId, format = 'pdf') {
-    const response = await fetch(`${this.baseURL}/download/${documentId}?format=${format}`);
-    return response.blob();
-  }
-
-  // Notifications
-  async getNotifications(unreadOnly = false) {
-    const params = new URLSearchParams({ unreadOnly });
-    return this.request(`/notifications?${params}`);
-  }
-
-  async markNotificationAsRead(id) {
-    return this.request(`/notifications/${id}/read`, {
-      method: 'PUT'
-    });
-  }
-}
-
-
-
-export const apiService = new ApiService();
-
-// src/services/api.js
-
-class DashboardAPI {
-  constructor() {
-    this.baseURL = `${API_BASE_URL}/dashboard`;
-  }
-
-  async request(endpoint, options = {}) {
-    const token = localStorage.getItem('token');
-    const url = `${this.baseURL}${endpoint}`;
-    
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token && { 'x-auth-token': token }),
-        ...options.headers
-      },
-      ...options
-    };
-
-    try {
-      const response = await fetch(url, config);
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.msg || 'Erreur API');
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error(`Erreur API ${endpoint}:`, error);
-      throw error;
-    }
-  }
-
-  async getDashboardData() {
-    return this.request('');
-  }
-
-  async getStats() {
-    return this.request('/stats');
-  }
-
-  async getTrainings() {
-    return this.request('/trainings');
-  }
-
-  async getForumActivity() {
-    return this.request('/forum');
-  }
-
-  async getComparisons() {
-    return this.request('/comparisons');
-  }
-
-  async getAchievements() {
-    return this.request('/achievements');
-  }
-
-  async getLearningPath() {
-    return this.request('/learning-path');
-  }
-
-  async getNotifications(params = {}) {
-    const query = new URLSearchParams(params).toString();
-    return this.request(`/notifications${query ? `?${query}` : ''}`);
-  }
-
+  // ===== FAVORIS =====
   async getFavorites() {
     return this.request('/favorites');
   }
 
-  async getSearchHistory() {
-    return this.request('/search-history');
-  }
-
-  async updateSettings(settings) {
-    return this.request('/settings', {
-      method: 'PUT',
-      body: JSON.stringify({ settings })
-    });
-  }
-
-  async markNotificationAsRead(notificationId) {
-    return this.request(`/notifications/${notificationId}/read`, {
-      method: 'PUT'
+  async addToFavorites(documentId) {
+    return this.request('/favorites', {
+      method: 'POST',
+      body: JSON.stringify({ documentId })
     });
   }
 
@@ -199,30 +136,167 @@ class DashboardAPI {
     });
   }
 
-  async addToFavorites(document) {
-    return this.request('/favorites', {
+  // ===== NOTIFICATIONS =====
+  async getNotifications(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return this.request(`/notifications${query ? `?${query}` : ''}`);
+  }
+
+  async markNotificationAsRead(id) {
+    return this.request(`/notifications/${id}/read`, {
+      method: 'PUT'
+    });
+  }
+
+  async markAllNotificationsAsRead() {
+    return this.request('/notifications/mark-all-read', {
+      method: 'PUT'
+    });
+  }
+
+  // ===== STATISTIQUES =====
+  async getStats() {
+    return this.request('/stats');
+  }
+
+  async getTrends(period = '30d', category) {
+    const params = new URLSearchParams({ 
+      period, 
+      ...(category && { category }) 
+    });
+    return this.request(`/trends?${params}`);
+  }
+
+  // ===== DASHBOARD =====
+  async getDashboardData() {
+    return this.request('/dashboard');
+  }
+
+  async updateSettings(settings) {
+    return this.request('/dashboard/settings', {
+      method: 'PUT',
+      body: JSON.stringify({ settings })
+    });
+  }
+
+  async getSearchHistory(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return this.request(`/dashboard/history${query ? `?${query}` : ''}`);
+  }
+
+  // ===== FORMATIONS =====
+  async getTrainings() {
+    return this.request('/formations');
+  }
+
+  async getTraining(id) {
+    return this.request(`/formations/${id}`);
+  }
+
+  async enrollInTraining(id) {
+    return this.request(`/formations/${id}/enroll`, {
+      method: 'POST'
+    });
+  }
+
+  async updateTrainingProgress(id, progress) {
+    return this.request(`/formations/${id}/progress`, {
       method: 'POST',
-      body: JSON.stringify(document)
+      body: JSON.stringify({ progress })
     });
   }
 
-  async deleteComparison(comparisonId) {
-    return this.request(`/comparisons/${comparisonId}`, {
+  // ===== FORUM =====
+  async getForumPosts(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return this.request(`/forum/posts${query ? `?${query}` : ''}`);
+  }
+
+  async getForumPost(id) {
+    return this.request(`/forum/posts/${id}`);
+  }
+
+  async createForumPost(postData) {
+    return this.request('/forum/posts', {
+      method: 'POST',
+      body: JSON.stringify(postData)
+    });
+  }
+
+  async replyToPost(id, replyData) {
+    return this.request(`/forum/posts/${id}/reply`, {
+      method: 'POST',
+      body: JSON.stringify(replyData)
+    });
+  }
+
+  async likePost(id) {
+    return this.request(`/forum/posts/${id}/like`, {
+      method: 'POST'
+    });
+  }
+
+  // ===== COMPARATEUR =====
+  async getComparisons() {
+    return this.request('/comparateur/comparisons');
+  }
+
+  async createComparison(comparisonData) {
+    return this.request('/comparateur/compare', {
+      method: 'POST',
+      body: JSON.stringify(comparisonData)
+    });
+  }
+
+  async updateComparison(id, updates) {
+    return this.request(`/comparateur/comparisons/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates)
+    });
+  }
+
+  async deleteComparison(id) {
+    return this.request(`/comparateur/comparisons/${id}`, {
       method: 'DELETE'
     });
   }
 
-  async clearSearchHistory() {
-    return this.request('/search-history', {
-      method: 'DELETE'
+  async shareComparison(id) {
+    return this.request(`/comparateur/comparisons/${id}/share`, {
+      method: 'POST'
     });
   }
 
-  async removeFromSearchHistory(searchId) {
-    return this.request(`/search-history/${searchId}`, {
-      method: 'DELETE'
+  // ===== TÉLÉCHARGEMENTS =====
+  async downloadDocument(documentId, format = 'pdf') {
+    const response = await fetch(`${this.baseURL}/download/${documentId}?format=${format}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('sunuloi_token') || sessionStorage.getItem('sunuloi_token')}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Erreur lors du téléchargement');
+    }
+
+    return response.blob();
+  }
+
+  // ===== UTILISATEURS =====
+  async updateUser(userData) {
+    return this.request('/users/profile', {
+      method: 'PUT',
+      body: JSON.stringify(userData)
+    });
+  }
+
+  async changePassword(passwordData) {
+    return this.request('/users/change-password', {
+      method: 'PUT',
+      body: JSON.stringify(passwordData)
     });
   }
 }
 
-export const dashboardAPI = new DashboardAPI();
+export const apiService = new ApiService();
+export default apiService;

@@ -1,43 +1,21 @@
-// Notifications de l'utilisateur
-router.get('/notifications', authMiddleware, async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { unreadOnly = false } = req.query;
-    
-    const notifications = await notificationService.getUserNotifications(userId, {
-      unreadOnly: unreadOnly === 'true'
-    });
-    
-    res.json({
-      success: true,
-      data: notifications
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Erreur lors de la récupération des notifications',
-      error: error.message
-    });
-  }
-});
+const express = require('express');
+const router = express.Router();
+const notificationController = require('../controllers/notificationController');
+const auth = require('../middleware/auth');
 
-// Marquer une notification comme lue
-router.put('/notifications/:id/read', authMiddleware, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const userId = req.user.id;
-    
-    await notificationService.markAsRead(id, userId);
-    
-    res.json({
-      success: true,
-      message: 'Notification marquée comme lue'
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Erreur lors de la mise à jour de la notification',
-      error: error.message
-    });
-  }
-});
+// GET /api/notifications
+router.get('/', auth, notificationController.getAll);
+
+// GET /api/notifications/unread-count
+router.get('/unread-count', auth, notificationController.getUnreadCount);
+
+// PUT /api/notifications/:id/read
+router.put('/:id/read', auth, notificationController.markAsRead);
+
+// PUT /api/notifications/mark-all-read
+router.put('/mark-all-read', auth, notificationController.markAllAsRead);
+
+// DELETE /api/notifications/:id
+router.delete('/:id', auth, notificationController.delete);
+
+module.exports = router;
